@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClickSize | All-in-One File Optimizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .tool-card:hover { transform: translateY(-5px); transition: 0.3s; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <nav class="bg-white border-b py-4 px-8 flex justify-between items-center">
+        <div class="text-2xl font-bold text-indigo-600">ClickSize<span class="text-gray-400">.tools</span></div>
+        <div class="hidden md:flex space-x-6 text-sm font-medium">
+            <a href="#" class="hover:text-indigo-600">Images</a>
+            <a href="#" class="hover:text-indigo-600">PDF</a>
+            <a href="#" class="hover:text-indigo-600">Video</a>
+        </div>
+    </nav>
+
+    <header class="py-16 px-4 text-center gradient-bg text-white">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Simplicity + Power.</h1>
+        <p class="text-lg opacity-90 max-w-2xl mx-auto">Upload. Compress. Download. Done. No sign-up, no logs, 100% private.</p>
+    </header>
+
+    <main class="max-w-4xl mx-auto -mt-10 px-4">
+        <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12">
+            
+            <div class="flex justify-center space-x-4 mb-8">
+                <button class="px-6 py-2 bg-indigo-600 text-white rounded-full font-bold">Images</button>
+                <button class="px-6 py-2 bg-gray-100 text-gray-500 rounded-full font-medium cursor-not-allowed" title="Coming Soon">PDF</button>
+                <button class="px-6 py-2 bg-gray-100 text-gray-500 rounded-full font-medium cursor-not-allowed" title="Coming Soon">Video</button>
+            </div>
+
+            <div id="dropZone" class="border-4 border-dashed border-gray-200 rounded-xl p-10 text-center hover:border-indigo-400 transition-all cursor-pointer">
+                <input type="file" id="fileInput" class="hidden" accept="image/*">
+                <div class="text-5xl mb-4">📁</div>
+                <p class="text-xl font-semibold">Drop your image here</p>
+                <p class="text-gray-400 text-sm mt-2">Maximum file size: 10MB (Client-side processing)</p>
+                <button class="mt-6 bg-indigo-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-indigo-700" onclick="document.getElementById('fileInput').click()">Select File</button>
+            </div>
+
+            <div id="resultArea" class="hidden mt-10 p-6 bg-indigo-50 rounded-xl border border-indigo-100">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-indigo-600 font-bold uppercase tracking-wider">Compression Status</p>
+                        <h3 id="statsText" class="text-lg font-bold text-gray-800">Optimizing...</h3>
+                    </div>
+                    <a id="downloadBtn" class="bg-green-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-600">Download Result</a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <section class="max-w-6xl mx-auto py-20 px-4 grid md:grid-cols-3 gap-8">
+        <div class="p-6 bg-white rounded-xl shadow-sm border tool-card text-center">
+            <div class="text-3xl mb-3">🛡️</div>
+            <h3 class="font-bold text-lg mb-2">100% Private</h3>
+            <p class="text-gray-500 text-sm">Files are processed in your browser. We never see your data.</p>
+        </div>
+        <div class="p-6 bg-white rounded-xl shadow-sm border tool-card text-center">
+            <div class="text-3xl mb-3">⚡</div>
+            <h3 class="font-bold text-lg mb-2">Instant Speed</h3>
+            <p class="text-gray-500 text-sm">One-click optimization without waiting in queues.</p>
+        </div>
+        <div class="p-6 bg-white rounded-xl shadow-sm border tool-card text-center">
+            <div class="text-3xl mb-3">💎</div>
+            <h3 class="font-bold text-lg mb-2">Smart Quality</h3>
+            <p class="text-gray-500 text-sm">Advanced algorithms to shrink files without ruining pixels.</p>
+        </div>
+    </section>
+
+    <footer class="text-center py-10 text-gray-400 text-sm border-t">
+        &copy; 2026 Clicksize.tools • Professional File Optimization
+    </footer>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const resultArea = document.getElementById('resultArea');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const statsText = document.getElementById('statsText');
+        const canvas = document.createElement('canvas');
+
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            resultArea.classList.remove('hidden');
+            statsText.innerText = "Processing " + file.name + "...";
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Simple logic: limit max width to 1920px
+                    const maxWidth = 1920;
+                    const scale = Math.min(1, maxWidth / img.width);
+                    canvas.width = img.width * scale;
+                    canvas.height = img.height * scale;
+                    
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    // Quality 0.7 for standard pro optimization
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    
+                    downloadBtn.href = dataUrl;
+                    downloadBtn.download = "clicksize_" + file.name;
+                    statsText.innerText = "Optimization Ready!";
+                }
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    </script>
+</body>
+</html>
